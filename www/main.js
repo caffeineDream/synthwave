@@ -1,19 +1,33 @@
-function newArray(N) {
-    // 2D array 
-    var base = new Array(N);
-    for (let i = 0; i < base.length; i++) {
-        base[i] = new Array(N);
+// Generate 2D-array, populate it with random ones and zeroes.
+function generateRandomArray(N) {
+    // Create empty 2D-array 
+    var initMatrix = new Array(N);
+    for (let i = 0; i < initMatrix.length; i++) {
+        initMatrix[i] = new Array(N);
     };
     // Populating array with random ones and zeroes
     for (let i = 0; i < N; i++) {
         for (let j = 0; j < N ; j++) {
-            base[i][j] = Math.round(Math.random());
+            initMatrix[i][j] = Math.round(Math.random());
         };
     };
-    return base;
+    // Thin out ones in array by half
+    for (let i = 0; i < N; i++) {
+        for (let j = 0; j < N ; j++) {
+          if (initMatrix[i][j] = 1) {
+              console.log('hi');
+          }   
+        };
+    };
+
+    return initMatrix;
 };
 
-var matrix = newArray(5);
+
+
+
+
+var matrix = generateRandomArray(5);
 console.log(matrix);
 
 var cols = matrix.length;
