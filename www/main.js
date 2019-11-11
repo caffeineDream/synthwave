@@ -1,20 +1,20 @@
 
 // Как завернуть Svg в функцию, но потом норально передать его в visualize?
-var originMatrix = generateRandomArray(8);
+var originMatrix = generateRandomArray(10);
 
 var playground = {
     length: originMatrix.length,
     cellSize: 50
 };
 
-var svg = d3.select("#playgroundContainer")
-                .append("svg")
-                .attr("width", playground.length * playground.cellSize)
-                .attr("height", playground.length * playground.cellSize);
-    svg.append("rect")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .attr("fill", "pink");
+var svg = d3.select('#playgroundContainer')
+                .append('svg')
+                .attr('width', playground.length * playground.cellSize)
+                .attr('height', playground.length * playground.cellSize);
+var rect = svg.append('rect')
+    .attr('width', '100%')
+    .attr('height', '100%')
+    .attr('fill', 'pink');
 
 visualize(originMatrix);
 
@@ -43,30 +43,27 @@ function generateRandomArray(N) {
           counter += 1;
         };
     };  
+    console.log(randomArray);
     return randomArray;
 };
 
 // Takes array and fills svg with it
 function visualize(matrix) {
+
     svg.append("g")
-        .selectAll("g")                 
-        .data(matrix)
-        .enter()
-        .append("g")
-        .attr('transform', function (d, i) {
-            return 'translate(' + i * playground.cellSize + ')'
-        })
-        .selectAll("text")
-        .data( function(d) { return d; } )
-        .enter()
-        .append("text")
-        .text( function(d,i,j) { return d; } )
-        .attr("x", function(d, i, j) {
-            return 30;
-        })
-        .attr('y', function(d, i) {
-            return i * playground.cellSize + 30;
-        })
-        .attr("font-family", "sans-serif")
-        .attr("font-size", "20px");
+                .selectAll("g")                 
+                .data(matrix)
+                .enter()
+                .append("g") //removing
+                .selectAll("text") // these
+                .data( function(d,i,j) { return d; } ) //lines
+                .enter() //text displays normally
+                .append("text")
+                .text( function(d,i,j) { return d; } )
+                .attr("x", function(d,i,j) {
+                			return (i * 20) + 40; 
+                })
+                .attr("y", function(d,i,j) { return (j * 20) + 40; })
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "20px")
 };
