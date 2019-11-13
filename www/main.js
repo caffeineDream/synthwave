@@ -1,22 +1,13 @@
-
-// Как завернуть Svg в функцию, но потом норально передать его в visualize?
+// Перенести SVG на 3d-canvas, в канвасе сделать масштаб
+// Закинуть параметры playground в объект, там же сохранить все цвета (в т.ч. сделать ссылку в css)
 var originMatrix = generateRandomArray(10);
 
-var playground = {
-    length: originMatrix.length,
-    cellSize: 50
-};
+// Playground size, increase k to make grid thicker
+const cellSize = 50;
+const k = 0.05;
+const grid = k * cellSize;
 
-var svg = d3.select('#playgroundContainer')
-                .append('svg')
-                .attr('width', playground.length * playground.cellSize)
-                .attr('height', playground.length * playground.cellSize);
-var rect = svg.append('rect')
-    .attr('width', '100%')
-    .attr('height', '100%')
-    .attr('fill', 'pink');
-
-visualize(originMatrix);
+visualize(originMatrix, createSvg());
 
 //-------------------------------------------------------------
 // Generate 2D-array, populate it with dead and living cells
@@ -47,23 +38,30 @@ function generateRandomArray(N) {
     return randomArray;
 };
 
-// Takes array and fills svg with it
-function visualize(matrix) {
+function createSvg() {
+    var svg = d3.select('#playgroundContainer')
+            .append('svg')
+            .attr('width', cellSize * (originMatrix.length + k * (originMatrix.length + 1)))
+            .attr('height', cellSize * (originMatrix.length + k * (originMatrix.length + 1)))
+            .attr('class', 'svg_background');
+    return svg;
+};
 
-    svg.append("g")
-                .selectAll("g")                 
-                .data(matrix)
-                .enter()
-                .append("g") //removing
-                .selectAll("text") // these
-                .data( function(d,i,j) { return d; } ) //lines
-                .enter() //text displays normally
-                .append("text")
-                .text( function(d,i,j) { return d; } )
-                .attr("x", function(d,i,j) {
-                			return (i * 20) + 40; 
-                })
-                .attr("y", function(d,i,j) { return (j * 20) + 40; })
-                .attr("font-family", "sans-serif")
-                .attr("font-size", "20px")
+// Takes array and fills svg with it
+function visualize(matrix, svg) {
+    svg.selectAll('g')
+       .data(matrix)
+       .enter()
+       .append('g')
+       .selectAll('rect')
+       .data(function(d) {return d;})
+       .enter()
+       .append('rect')
+       .attr('x', (d, i, j) => i * cellSize + grid * (i + 1))
+       .attr('y', (d, i, j) => j * cellSize + grid * (j + 1))
+       .attr('width', cellSize)
+       .attr('height', cellSize)
+       .attr('fill', (d) => {
+           if (d == 1) { return '#00c147'} else {return '#ffe57a'}
+       })
 };
