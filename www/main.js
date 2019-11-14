@@ -1,14 +1,22 @@
+// Сделать заготовку для f маятника
+// сделать переключение (только) цвета на hover
+// Первая колонка всегда нули???
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
-// Закинуть параметры playground в объект, там же сохранить все цвета (в т.ч. сделать ссылку в css)
 var originMatrix = generateRandomArray(10);
 
-// Playground size, increase k to make grid thicker
-const cellSize = 50;
-const k = 0.05;
-const grid = k * cellSize;
+// Playground params, increase k to make grid thicker
+var playground = {
+    cellSize: 50,
+    k: 0.05,
+    deadColor: '#ffe57a',
+    aliveColor: '#00c147',
+    gridColor: 'pink'
+};
+playground.grid = playground.k * playground.cellSize;
 
-visualize(originMatrix, createSvg());
+visualizeOrigin(originMatrix, createSvg());
 
+document.getElementById('playground').style.background = playground.gridColor;
 //-------------------------------------------------------------
 // Generate 2D-array, populate it with dead and living cells
 function generateRandomArray(N) {
@@ -41,14 +49,13 @@ function generateRandomArray(N) {
 function createSvg() {
     var svg = d3.select('#playgroundContainer')
             .append('svg')
-            .attr('width', cellSize * (originMatrix.length + k * (originMatrix.length + 1)))
-            .attr('height', cellSize * (originMatrix.length + k * (originMatrix.length + 1)))
-            .attr('class', 'svg_background');
+            .attr('width', playground.cellSize * (originMatrix.length + playground.k * (originMatrix.length + 1)))
+            .attr('height', playground.cellSize * (originMatrix.length + playground.k * (originMatrix.length + 1)))
+            .attr('id', 'playground');
     return svg;
 };
 
-// Takes array and fills svg with it
-function visualize(matrix, svg) {
+function visualizeOrigin(matrix, svg) {
     svg.selectAll('g')
        .data(matrix)
        .enter()
@@ -57,11 +64,24 @@ function visualize(matrix, svg) {
        .data(function(d) {return d;})
        .enter()
        .append('rect')
-       .attr('x', (d, i, j) => i * cellSize + grid * (i + 1))
-       .attr('y', (d, i, j) => j * cellSize + grid * (j + 1))
-       .attr('width', cellSize)
-       .attr('height', cellSize)
+       .attr('x', (d, i, j) => i * playground.cellSize + playground.grid * (i + 1))
+       .attr('y', (d, i, j) => j * playground.cellSize + playground.grid * (j + 1))
+       .attr('width', playground.cellSize)
+       .attr('height', playground.cellSize)
        .attr('fill', (d) => {
-           if (d == 1) { return '#00c147'} else {return '#ffe57a'}
+           if (d == 1) { return playground.aliveColor} else {return playground.deadColor}
        })
+       .on('click', function (d) {
+           d3.select(this).datum(function() {
+                console.log('Cell was ' + this.__data__)
+                if (this.__data__ == 1) {
+                    d3.select(this).attr('fill', playground.deadColor);
+                    return 0;
+                } else if (this.__data__ == 0) {
+                    d3.select(this).attr('fill', playground.aliveColor);
+                    return 1;
+                };
+           })
+           
+       });
 };
