@@ -2,6 +2,6 @@ body {
     margin: 0;
 }
 
-.svg_background {
-    background-color: pink;
+rect:hover {
+    opacity: 0.5
 }
