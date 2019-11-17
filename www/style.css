@@ -5,3 +5,10 @@ body {
 rect:hover {
     opacity: 0.5
 }
+
+.start-button {
+    width: 100px;
+    height: 50px;
+    margin: 10px;
+    margin-left: 280px;
+}

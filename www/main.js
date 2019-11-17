@@ -1,8 +1,23 @@
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
 document.addEventListener('DOMContentLoaded', getStarted());
 
+document.getElementById('start').addEventListener('click', getPrimordialMatrix)
+
+function getPrimordialMatrix() {
+    const rawOrigin = d3.selectAll('rect').data()
+    const edgeLength = Math.sqrt(rawOrigin.length);
+    var primordialMatrix = [];
+    for (let i = 0; i < rawOrigin.length;) {
+        primordialMatrix.push(rawOrigin.slice(i, i+=edgeLength))
+    };
+    console.log(primordialMatrix)
+};
+
+
+
+
 function getStarted() {
-    var originMatrix = generateRandomArray(12);
+    var originMatrix = generateRandomArray(8);
 
     // Playground params, increase k to make grid thicker
     var playground = {
