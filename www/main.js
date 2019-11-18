@@ -1,7 +1,34 @@
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
 document.addEventListener('DOMContentLoaded', getStarted());
 
-document.getElementById('start').addEventListener('click', getPrimordialMatrix)
+document.getElementById('start').addEventListener('click', manageCycle);
+
+
+function manageCycle() {
+    var test = getPrimordialMatrix();
+    var test2 = lifeLogic(test);
+    // console.log(test2)
+
+
+    // Gonna be this way
+    // visualizeCycle(lifeLogic(currentMatrix));
+    // manageCycle(lifeLogic(currentMatrix));
+};
+
+// promise chain???
+// в .map второй аргумент - индекс элемента
+function lifeLogic(currentMatrix) {
+    var newGen = currentMatrix.map((subArray) => {
+                    return subArray.map((cell) => {
+                        return cell + 1;
+                    });
+                });
+    console.log(newGen)
+};
+
+function visualizeCycle(newMatrix) {
+    console.log(newMatrix + ' and i am visual');
+};
 
 function getPrimordialMatrix() {
     const rawOrigin = d3.selectAll('rect').data()
@@ -10,11 +37,8 @@ function getPrimordialMatrix() {
     for (let i = 0; i < rawOrigin.length;) {
         primordialMatrix.push(rawOrigin.slice(i, i+=edgeLength))
     };
-    console.log(primordialMatrix)
+    return primordialMatrix;
 };
-
-
-
 
 function getStarted() {
     var originMatrix = generateRandomArray(8);
