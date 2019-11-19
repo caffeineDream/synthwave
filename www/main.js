@@ -1,3 +1,4 @@
+// Сделать обработчик крайних клеток
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
 document.addEventListener('DOMContentLoaded', getStarted());
 
@@ -15,20 +16,36 @@ function manageCycle() {
     // manageCycle(lifeLogic(currentMatrix));
 };
 
-// promise chain???
-// в .map второй аргумент - индекс элемента
 function lifeLogic(currentMatrix) {
-    var newGen = currentMatrix.map((subArray) => {
-                    return subArray.map((cell) => {
-                        return cell + 1;
-                    });
-                });
-    console.log(newGen)
+
+    var editedArray = currentMatrix.map((subArray, i) => {
+        return subArray.map((cell, j) => {
+                if (cell == 1) {
+                    const neighborsAmount = countNeighbors(currentMatrix, i, j);
+                    console.log('alive: ' + neighborsAmount);
+                    return cell;
+                } // add if (cell == 0) here 
+                
+            });
+    });
+    //console.log(editedArray);
+
+    function countNeighbors(currentMatrix, iCell, jCell) {
+        let counter = -1; // for loop includes the cell being observed
+        for (let x = -1; x < 2; x++) {
+            for (let y = -1; y < 2; y++) {
+                if (currentMatrix[iCell + x][jCell + y] == 1) {
+                    counter++;
+                };
+            };
+        };
+        return counter;
+    };
 };
 
-function visualizeCycle(newMatrix) {
-    console.log(newMatrix + ' and i am visual');
-};
+// function visualizeCycle(newMatrix) {
+//     console.log(newMatrix + ' and i am visual');
+// };
 
 function getPrimordialMatrix() {
     const rawOrigin = d3.selectAll('rect').data()
@@ -41,7 +58,7 @@ function getPrimordialMatrix() {
 };
 
 function getStarted() {
-    var originMatrix = generateRandomArray(8);
+    var originMatrix = generateRandomArray(4);
 
     // Playground params, increase k to make grid thicker
     var playground = {
