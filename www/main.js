@@ -1,4 +1,4 @@
-// Сделать обработчик крайних клеток
+// Читать про try {} catch {}
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
 document.addEventListener('DOMContentLoaded', getStarted());
 
@@ -22,7 +22,7 @@ function lifeLogic(currentMatrix) {
         return subArray.map((cell, j) => {
                 if (cell == 1) {
                     const neighborsAmount = countNeighbors(currentMatrix, i, j);
-                    console.log('alive: ' + neighborsAmount);
+                    console.log('alive neighbors: ' + neighborsAmount);
                     return cell;
                 } // add if (cell == 0) here 
                 
@@ -31,16 +31,25 @@ function lifeLogic(currentMatrix) {
     //console.log(editedArray);
 
     function countNeighbors(currentMatrix, iCell, jCell) {
+        
         let counter = -1; // for loop includes the cell being observed
         for (let x = -1; x < 2; x++) {
             for (let y = -1; y < 2; y++) {
-                if (currentMatrix[iCell + x][jCell + y] == 1) {
-                    counter++;
+                if (!isUndefined(currentMatrix, iCell + x, jCell + y )) {
+                    if (currentMatrix[iCell + x][jCell + y] == 1) {
+                        counter++;
+                    };
                 };
             };
+
         };
         return counter;
     };
+
+    function isUndefined(array, i, j) {
+        try { return array[i][j] == undefined; } catch(e) { return true; }
+    };
+    
 };
 
 // function visualizeCycle(newMatrix) {
