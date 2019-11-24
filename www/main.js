@@ -6,6 +6,7 @@ var playgroundParams = {
     deadColor: '#93ACB5',
     aliveColor: '#6DA34D',
     gridColor: '#A9D3FF',
+    cycleSpeed: 250
 };
 playgroundParams.grid = playgroundParams.k * playgroundParams.cellSize;
 
@@ -27,7 +28,7 @@ function manageCycles(matrix) {
     visualizeCycle(nextGenMatrix);
     setTimeout(function() {
         manageCycles(nextGenMatrix);
-    }, 500);
+    }, playgroundParams.cycleSpeed);
 };
 
 function lifeLogic(currentMatrix) {
