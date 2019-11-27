@@ -1,7 +1,9 @@
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
+// Две разных Visualize переделать в одну?
+// generateRandomArray теперь в глобалке =(
 
 var playgroundParams = {
-    matrixSize: 10,
+    matrixSize: 8,
     cellSize: 50,
     // increase k to make grid thicker
     k: 0.05,
@@ -20,7 +22,21 @@ var buttonActionStore = {
         paused = true;
     },
     resume: function() {
-        console.log('hi', paused);
+        currentMatrixState = getMatrixFromSvg();
+        paused = false;
+        manageCycles(currentMatrixState);
+    },
+    clear: function() {
+        currentMatrixState = currentMatrixState.map((subArray, i) => {
+            return subArray.map((cell, j) => {
+                    return 0;
+                });
+        });
+        visualizeMatrixAnew(currentMatrixState);
+    },
+    randomize: function() {
+         currentMatrixState = generateRandomArray(playgroundParams.matrixSize)
+         visualizeMatrixAnew(currentMatrixState);
     }
 };
 
@@ -28,17 +44,20 @@ document.addEventListener('DOMContentLoaded', getStarted(playgroundParams));
 document.getElementById('start').addEventListener('click', startCycle);
 document.getElementById('pause').addEventListener('click', buttonActionStore.pause);
 document.getElementById('resume').addEventListener('click', buttonActionStore.resume);
+document.getElementById('clear').addEventListener('click', buttonActionStore.clear);
+document.getElementById('randomize').addEventListener('click', buttonActionStore.randomize);
 
 function startCycle() {
-    var zeroGenMatrix = getZeroGeneration();
+    currentMatrixState = getMatrixFromSvg();
+    var zeroGenMatrix = currentMatrixState;
     var firstGenMatrix = lifeLogic(zeroGenMatrix);
-    visualizeCycle(firstGenMatrix);
+    visualizeMatrixAnew(firstGenMatrix);
     manageCycles(firstGenMatrix);
 };
 
 function manageCycles(matrix) {
-    var nextGenMatrix = lifeLogic(matrix);
-    visualizeCycle(nextGenMatrix);
+    var nextGenMatrix = lifeLogic(matrix);;
+    visualizeMatrixAnew(nextGenMatrix);
     if (!paused) {
         setTimeout(function() {
             manageCycles(nextGenMatrix);
@@ -48,7 +67,6 @@ function manageCycles(matrix) {
 };
 
 function lifeLogic(currentMatrix) {
-
     function countNeighbors(currentMatrix, iCell, jCell) {
         function isUndefined(array, i, j) {
             try {
@@ -71,7 +89,6 @@ function lifeLogic(currentMatrix) {
         };
         return counter;
     };
-
     var nextGenMatrix = currentMatrix.map((subArray, i) => {
         return subArray.map((cell, j) => {
                 if (cell == 1) {
@@ -87,10 +104,11 @@ function lifeLogic(currentMatrix) {
                 }; 
             });
     });
+    currentMatrixState = nextGenMatrix;
     return nextGenMatrix;
 };
 
-function visualizeCycle(matrix) {
+function visualizeMatrixAnew(matrix) {
     var svg = d3.select('#playground');
     svg.selectAll('g').remove();
 
@@ -123,7 +141,7 @@ function visualizeCycle(matrix) {
     });
 };
 
-function getZeroGeneration() {
+function getMatrixFromSvg() {
     const rawOrigin = d3.selectAll('rect').data()
     const edgeLength = Math.sqrt(rawOrigin.length);
     var zeroGenMatrix = [];
@@ -132,28 +150,28 @@ function getZeroGeneration() {
     };
     return zeroGenMatrix;
 };
+// Generate 2D-array, populate it with dead and living cells 50/50
+function generateRandomArray(N) {
+    // Create empty 2D-array 
+    var randomArray = new Array(N);
+    for (let i = 0; i < randomArray.length; i++) {
+        randomArray[i] = new Array(N);
+    };
+    // Populating array with dead and living cells ~ 50/50
+    for (let i = 0; i < N; i++) {
+        for (let j = 0; j < N ; j++) {
+            randomArray[i][j] = Math.round(Math.random());
+        };
+    };
+    console.log(randomArray);
+    return randomArray;
+};
 
 function getStarted(playgroundParams) {
-    var originMatrix = generateRandomArray(playgroundParams.matrixSize);
+    currentMatrixState = generateRandomArray(playgroundParams.matrixSize);
+    const originMatrix = currentMatrixState;
 
     visualizeOrigin(originMatrix, createSvg(playgroundParams), playgroundParams);
-
-    // Generate 2D-array, populate it with dead and living cells
-    function generateRandomArray(N) {
-        // Create empty 2D-array 
-        var randomArray = new Array(N);
-        for (let i = 0; i < randomArray.length; i++) {
-            randomArray[i] = new Array(N);
-        };
-        // Populating array with dead and living cells ~ 50/50
-        for (let i = 0; i < N; i++) {
-            for (let j = 0; j < N ; j++) {
-                randomArray[i][j] = Math.round(Math.random());
-            };
-        };
-        console.log(randomArray);
-        return randomArray;
-    };
 
     function createSvg(playgroundParams) {
         var svg = d3. select('#playgroundContainer')
