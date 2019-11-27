@@ -1,20 +1,33 @@
-// Исправить for на .map в getZeroGeneration
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
+
 var playgroundParams = {
+    matrixSize: 10,
     cellSize: 50,
+    // increase k to make grid thicker
     k: 0.05,
     deadColor: '#93ACB5',
     aliveColor: '#6DA34D',
     gridColor: '#A9D3FF',
-    cycleSpeed: 250
+    cycleSpeed: 125
 };
 playgroundParams.grid = playgroundParams.k * playgroundParams.cellSize;
 
+var currentMatrixState;
+var paused = false;
+
+var buttonActionStore = {
+    pause: function() {
+        paused = true;
+    },
+    resume: function() {
+        console.log('hi', paused);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', getStarted(playgroundParams));
 document.getElementById('start').addEventListener('click', startCycle);
-
-// Playground params, increase k to make grid thicker
-
+document.getElementById('pause').addEventListener('click', buttonActionStore.pause);
+document.getElementById('resume').addEventListener('click', buttonActionStore.resume);
 
 function startCycle() {
     var zeroGenMatrix = getZeroGeneration();
@@ -26,9 +39,12 @@ function startCycle() {
 function manageCycles(matrix) {
     var nextGenMatrix = lifeLogic(matrix);
     visualizeCycle(nextGenMatrix);
-    setTimeout(function() {
-        manageCycles(nextGenMatrix);
-    }, playgroundParams.cycleSpeed);
+    if (!paused) {
+        setTimeout(function() {
+            manageCycles(nextGenMatrix);
+        }, playgroundParams.cycleSpeed);
+    };
+
 };
 
 function lifeLogic(currentMatrix) {
@@ -74,8 +90,6 @@ function lifeLogic(currentMatrix) {
     return nextGenMatrix;
 };
 
-//--------------------------------------------------
-//--------------------------------------------------
 function visualizeCycle(matrix) {
     var svg = d3.select('#playground');
     svg.selectAll('g').remove();
@@ -108,8 +122,6 @@ function visualizeCycle(matrix) {
         });   
     });
 };
-//---------------------------------------------------
-//---------------------------------------------------
 
 function getZeroGeneration() {
     const rawOrigin = d3.selectAll('rect').data()
@@ -122,7 +134,7 @@ function getZeroGeneration() {
 };
 
 function getStarted(playgroundParams) {
-    var originMatrix = generateRandomArray(15);
+    var originMatrix = generateRandomArray(playgroundParams.matrixSize);
 
     visualizeOrigin(originMatrix, createSvg(playgroundParams), playgroundParams);
 
