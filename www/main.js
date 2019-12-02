@@ -1,6 +1,4 @@
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
-// Две разных Visualize переделать в одну?
-// generateRandomArray теперь в глобалке =(
 
 var playgroundParams = {
     matrixSize: 8,
@@ -32,32 +30,64 @@ var buttonActionStore = {
                     return 0;
                 });
         });
-        visualizeMatrixAnew(currentMatrixState);
+        updateMatrix(currentMatrixState);
     },
     randomize: function() {
          currentMatrixState = generateRandomArray(playgroundParams.matrixSize)
-         visualizeMatrixAnew(currentMatrixState);
+         updateMatrix(currentMatrixState);
     }
 };
 
 document.addEventListener('DOMContentLoaded', getStarted(playgroundParams));
-document.getElementById('start').addEventListener('click', startCycle);
-document.getElementById('pause').addEventListener('click', buttonActionStore.pause);
-document.getElementById('resume').addEventListener('click', buttonActionStore.resume);
+document.getElementById('play').addEventListener('click', function () {
+    switch (this.value) {
+        case '0':
+            startCycle();
+            this.value = 1;
+            this.textContent = 'Pause';
+            document.getElementById('clear').disabled = true;
+            document.getElementById('randomize').disabled = true;
+            document.getElementById('sizeRange').disabled = true;
+            break;
+        case '1':
+            buttonActionStore.pause();
+            this.value = 2;
+            this.textContent = 'Resume';
+            document.getElementById('clear').disabled = false;
+            document.getElementById('randomize').disabled = false;
+            break;
+        case '2':
+            buttonActionStore.resume();
+            this.value = 1;
+            this.textContent = 'Pause';
+            document.getElementById('clear').disabled = true;
+            document.getElementById('randomize').disabled = true;
+            break;
+    };
+});
 document.getElementById('clear').addEventListener('click', buttonActionStore.clear);
 document.getElementById('randomize').addEventListener('click', buttonActionStore.randomize);
+document.getElementById('speedRange').addEventListener('input', function() {
+    playgroundParams.cycleSpeed = this.value;
+});
+document.getElementById('sizeRange').addEventListener('input', function() {
+    playgroundParams.matrixSize = this.value;
+    d3.select('svg').remove();
+    console.log(playgroundParams.matrixSize);
+    getStarted(playgroundParams);
+});
 
 function startCycle() {
     currentMatrixState = getMatrixFromSvg();
     var zeroGenMatrix = currentMatrixState;
     var firstGenMatrix = lifeLogic(zeroGenMatrix);
-    visualizeMatrixAnew(firstGenMatrix);
+    updateMatrix(firstGenMatrix);
     manageCycles(firstGenMatrix);
 };
 
 function manageCycles(matrix) {
     var nextGenMatrix = lifeLogic(matrix);;
-    visualizeMatrixAnew(nextGenMatrix);
+    updateMatrix(nextGenMatrix);
     if (!paused) {
         setTimeout(function() {
             manageCycles(nextGenMatrix);
@@ -108,7 +138,7 @@ function lifeLogic(currentMatrix) {
     return nextGenMatrix;
 };
 
-function visualizeMatrixAnew(matrix) {
+function updateMatrix(matrix) {
     var svg = d3.select('#playground');
     svg.selectAll('g').remove();
 
@@ -150,11 +180,11 @@ function getMatrixFromSvg() {
     };
     return zeroGenMatrix;
 };
-// Generate 2D-array, populate it with dead and living cells 50/50
+
 function generateRandomArray(N) {
     // Create empty 2D-array 
-    var randomArray = new Array(N);
-    for (let i = 0; i < randomArray.length; i++) {
+    var randomArray = [];
+    for (let i = 0; i < N; i++) {
         randomArray[i] = new Array(N);
     };
     // Populating array with dead and living cells ~ 50/50
