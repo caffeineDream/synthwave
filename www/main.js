@@ -42,6 +42,7 @@ var buttonActionStore = {
         updateMatrix(currentMatrixState);
         generationCounter = 0;
         document.getElementById('genScore').textContent = generationCounter;
+        document.getElementById('sizeRange').disabled = false;
         paused = true;
     },
     nextGeneration: function () {
