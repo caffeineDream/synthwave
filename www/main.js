@@ -1,7 +1,8 @@
 // Перенести SVG на 3d-canvas, в канвасе сделать масштаб
+// Исправить в 'play' 'onlick'
 
 var playgroundParams = {
-    matrixSize: 8,
+    matrixSize: 15,
     cellSize: 50,
     // increase k to make grid thicker
     k: 0.05,
@@ -13,7 +14,8 @@ var playgroundParams = {
 playgroundParams.grid = playgroundParams.k * playgroundParams.cellSize;
 
 var currentMatrixState;
-var paused = false;
+var paused = true;
+var generationCounter = 0;
 
 var buttonActionStore = {
     pause: function() {
@@ -32,9 +34,18 @@ var buttonActionStore = {
         });
         updateMatrix(currentMatrixState);
     },
-    randomize: function() {
-         currentMatrixState = generateRandomArray(playgroundParams.matrixSize)
-         updateMatrix(currentMatrixState);
+    reset: function() {
+        var playButton = document.getElementById('play');
+        playButton.value = 0;
+        playButton.textContent = 'Start!'
+        currentMatrixState = generateRandomArray(playgroundParams.matrixSize);
+        updateMatrix(currentMatrixState);
+        generationCounter = 0;
+        document.getElementById('genScore').textContent = generationCounter;
+        paused = true;
+    },
+    nextGeneration: function () {
+        manageCycles(currentMatrixState);
     }
 };
 
@@ -42,31 +53,37 @@ document.addEventListener('DOMContentLoaded', getStarted(playgroundParams));
 document.getElementById('play').addEventListener('click', function () {
     switch (this.value) {
         case '0':
+            paused = false;
             startCycle();
             this.value = 1;
             this.textContent = 'Pause';
             document.getElementById('clear').disabled = true;
-            document.getElementById('randomize').disabled = true;
             document.getElementById('sizeRange').disabled = true;
+            document.getElementById('reset').disabled = true;
+            document.getElementById('genScore').disabled = true;
             break;
         case '1':
+            paused = true;
             buttonActionStore.pause();
             this.value = 2;
             this.textContent = 'Resume';
             document.getElementById('clear').disabled = false;
-            document.getElementById('randomize').disabled = false;
+            document.getElementById('reset').disabled = false;
+            document.getElementById('genScore').disabled = false;
             break;
         case '2':
+            paused = false;
             buttonActionStore.resume();
             this.value = 1;
             this.textContent = 'Pause';
             document.getElementById('clear').disabled = true;
-            document.getElementById('randomize').disabled = true;
+            document.getElementById('reset').disabled = true;
+            document.getElementById('genScore').disabled = true;
             break;
     };
 });
 document.getElementById('clear').addEventListener('click', buttonActionStore.clear);
-document.getElementById('randomize').addEventListener('click', buttonActionStore.randomize);
+document.getElementById('reset').addEventListener('click', buttonActionStore.reset);
 document.getElementById('speedRange').addEventListener('input', function() {
     playgroundParams.cycleSpeed = this.value;
 });
@@ -76,6 +93,7 @@ document.getElementById('sizeRange').addEventListener('input', function() {
     console.log(playgroundParams.matrixSize);
     getStarted(playgroundParams);
 });
+document.getElementById('genScore').addEventListener('click', buttonActionStore.nextGeneration);
 
 function startCycle() {
     currentMatrixState = getMatrixFromSvg();
@@ -88,6 +106,8 @@ function startCycle() {
 function manageCycles(matrix) {
     var nextGenMatrix = lifeLogic(matrix);;
     updateMatrix(nextGenMatrix);
+    generationCounter++;
+    document.getElementById('genScore').textContent = generationCounter;
     if (!paused) {
         setTimeout(function() {
             manageCycles(nextGenMatrix);
